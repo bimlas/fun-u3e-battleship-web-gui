@@ -1,0 +1,3 @@
+= u3e Battleship web GUI
+
+Fun project for practicing.
