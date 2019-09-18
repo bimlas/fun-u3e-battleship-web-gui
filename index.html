@@ -6,15 +6,29 @@
     <style>
         body {
             background-color: #a5a5ff;
+            font-family: monospace;
+            color: #ffff00;
+            font-weight: bold;
         }
-        #container {
+        .row, .column {
             display: flex;
             justify-content: space-evenly;
             align-items: center;
         }
+        .column {
+            flex-direction: column;
+        }
+        .hud {
+            background-color: #aaffee;
+            color: #000000;
+            width: 75%;
+            min-height: 100px;
+            border: 8px solid #a1683c;
+            padding: 8px;
+        }
         .battlefield {
             background-color: #4242e7;
-            border: 4px solid #ffff00;
+            border: 8px solid #ffff00;
             width: 500px;
             height: 500px;
             line-height: 0;
@@ -61,9 +75,22 @@
   }
 </script>
 <body>
-    <div id="container">
-        <div class="battlefield" id="player"></div>
-        <div class="battlefield" id="enemy"></div>
+    <div class="column">
+        <h1>u3e Battleship</h1>
+        <label>Player name<br/><input type="text" name="player-name"></label>
+        <label>Server address<br/><input type="text" name="player-name"></label>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="battlefield" id="player"></div>
+            <h2 id="player-name">Player</h2>
+            <div class="hud">Remaining player ships...</div>
+        </div>
+        <div class="column">
+            <div class="battlefield" id="enemy"></div>
+            <h2 id="enemy-name">Enemy</h2>
+            <div class="hud">Remaining enemy ships...</div>
+        </div>
     </div>
 </body>
 </html>
