@@ -43,9 +43,48 @@
 </head>
 <script>
   document.addEventListener('DOMContentLoaded', event => {
+    document.querySelector('#settings').addEventListener('submit', (event) => {
+      event.preventDefault();
+      getFromServer('/boards', initGame);
+    })
+  });
+
+  function getFromServer(path, callback) {
     const
-      numberOfColumns = 10,
-      numberOfRows = 10;
+      Http = new XMLHttpRequest(),
+      url = document.querySelector('#server-address-input').value;
+
+    Http.open("GET", `${url}${path}`);
+    Http.send();
+
+    Http.onreadystatechange = (e) => {
+      if (Http.readyState === 4 && Http.status === 200) {
+        callback(JSON.parse(Http.responseText));
+      }
+    }
+  }
+
+  function postToServer(data, callback) {
+    const
+      Http = new XMLHttpRequest(),
+      url = document.querySelector('#server-address-input').value;
+
+    Http.open("POST", url);
+    Http.send(JSON.stringify(data));
+
+    Http.onreadystatechange = (e) => {
+      if (Http.readyState === 4 && Http.status === 200) {
+        callback(JSON.parse(Http.responseText));
+      }
+    }
+  }
+
+  function initGame(gameProperties) {
+    const
+      numberOfColumns = gameProperties.width,
+      numberOfRows = gameProperties.height;
+
+    document.querySelectorAll('.cell').forEach(cell => cell.remove());
 
     document.querySelectorAll('.battlefield').forEach(battlefield => {
       for (let y = 0; y < numberOfRows; y++) {
@@ -63,7 +102,7 @@
      Az {x=2, y=3} koordinatan (0-tol indulo indexek) egy hajo van
      */
     document.querySelector('#enemy .x2.y3').style.backgroundColor = '#ffff00';
-  });
+  }
 
   function createCell(numberOfColumns, numberOfRows) {
     const cell = document.createElement('div');
@@ -74,11 +113,12 @@
   }
 </script>
 <body>
-    <div class="column">
+    <form id="settings" class="column">
         <h1>u3e Battleship</h1>
-        <label>Player name<br/><input type="text" name="player-name"></label>
-        <label>Server address<br/><input type="text" name="player-name"></label>
-    </div>
+        <label>Player name<br/><input type="text" id="player-name-input"></label>
+        <label>Server address<br/><input type="text" id="server-address-input"></label>
+        <button type="submit">Connect</button>
+    </form>
     <div class="row">
         <div class="column">
             <div class="battlefield" id="player"></div>
