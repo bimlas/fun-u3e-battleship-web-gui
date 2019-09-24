@@ -8,44 +8,49 @@ const httpServer = http.createServer(function (req, resp) {
 
   console.log(`${(new Date()).toISOString()} ${req.method} "${requestedPath}"`);
 
-  /*
-  Set Access-Control-Allow-Origin http header will fix
-  "No 'Access-Control-Allow-Origin' header is present on the requested resource"
-  error (CORS policy) when use XMLHttpRequest object to get this server
-  page via ajax method.
-  */
-  resp.writeHead(200, {'Access-Control-Allow-Origin': '*'});
+  respond('/boards',
+    () => JSON.stringify({
+      width: 10,
+      height: 10,
+    })
+  );
 
-  if (requestedPath === '/boards') {
-    if (req.method === 'GET') {
-      // Send response
-      // TODO: Initiate the proper game
-      resp.end(JSON.stringify({
-        width: 10,
-        height: 10,
-      }));
+  respond('/action',
+    null,
+    (postDataObject) => { return 'OK'; }
+  );
+
+  function respond(path, getHandler, postHandler) {
+    /*
+    Set Access-Control-Allow-Origin http header will fix
+    "No 'Access-Control-Allow-Origin' header is present on the requested resource"
+    error (CORS policy) when use XMLHttpRequest object to get this server
+    page via ajax method.
+    */
+    resp.writeHead(200, {'Access-Control-Allow-Origin': '*'});
+
+    if (requestedPath !== path) return;
+
+    if ((req.method === 'GET') && getHandler) {
+      resp.end(getHandler());
+    }
+    if ((req.method === 'POST') && postHandler) {
+      resp.end(passPostData(postHandler));
     }
   }
 
-  if (requestedPath === '/action') {
-    if (req.method === 'POST') {
-      let postData = '';
+  function passPostData(callback) {
+    let postData = '';
 
-      req.on('data', function (chunk) {
-        postData += chunk;
-      });
+    req.on('data', function (chunk) {
+      postData += chunk;
+    });
 
-      req.on('end', function () {
-        const postDataObject = JSON.parse(postData);
-        console.log("Client post data: " + postData);
-
-        // // Handle POST data
-        // if (postDataObject.init) {
-        //   // Send response
-        //   resp.end(JSON.stringify({width: 10, height: 10}));
-        // }
-      })
-    }
+    req.on('end', function () {
+      console.log("Client post data: " + postData);
+      const postDataObject = JSON.parse(postData);
+      return callback(postDataObject);
+    })
   }
 });
 
