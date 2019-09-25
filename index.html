@@ -39,15 +39,28 @@
             border: 1px solid #a5a5ff;
             box-sizing: border-box;
         }
+        .active {
+            background-color: #ffff00;
+        }
     </style>
 </head>
 <script>
   document.addEventListener('DOMContentLoaded', event => {
-    document.querySelector('#settings').addEventListener('submit', (event) => {
-      event.preventDefault();
-      getFromServer('/boards', initGame);
-    })
+    document.querySelector('#settings').addEventListener('submit', joinToGame);
+    document.querySelector('#next-turn').addEventListener('click', updateGameState);
   });
+
+  function joinToGame(event) {
+    event.preventDefault();
+
+    const playerName = document.querySelector('#player-name-input').value;
+    postToServer('/snake', {playerName: playerName, action: 'joinGame'}, initGame);
+  }
+
+  function updateGameState(event) {
+    event.preventDefault();
+    getFromServer('/snake', initGame);
+  }
 
   function getFromServer(path, callback) {
     const
@@ -64,12 +77,12 @@
     }
   }
 
-  function postToServer(data, callback) {
+  function postToServer(path, data, callback) {
     const
       Http = new XMLHttpRequest(),
       url = document.querySelector('#server-address-input').value;
 
-    Http.open("POST", url);
+    Http.open("POST", `${url}${path}`);
     Http.send(JSON.stringify(data));
 
     Http.onreadystatechange = (e) => {
@@ -79,10 +92,10 @@
     }
   }
 
-  function initGame(gameProperties) {
+  function initGame(board) {
     const
-      numberOfColumns = gameProperties.width,
-      numberOfRows = gameProperties.height;
+      numberOfColumns = board[0].length,
+      numberOfRows = board.length;
 
     document.querySelectorAll('.cell').forEach(cell => cell.remove());
 
@@ -92,16 +105,13 @@
           const cell = createCell(numberOfColumns, numberOfRows);
           cell.classList.add(`x${x}`);
           cell.classList.add(`y${y}`);
+          if(board[y][x] === 1) {
+            cell.classList.add('active');
+          }
           battlefield.appendChild(cell);
         }
       }
     });
-
-    /*
-     PELDA AZ API HASZNALATARA:
-     Az {x=2, y=3} koordinatan (0-tol indulo indexek) egy hajo van
-     */
-    document.querySelector('#enemy .x2.y3').style.backgroundColor = '#ffff00';
   }
 
   function createCell(numberOfColumns, numberOfRows) {
@@ -118,6 +128,7 @@
         <label>Player name<br/><input type="text" id="player-name-input"></label>
         <label>Server address<br/><input type="text" id="server-address-input"></label>
         <button type="submit">Connect</button>
+        <button id="next-turn">Next turn</button>
     </form>
     <div class="row">
         <div class="column">
