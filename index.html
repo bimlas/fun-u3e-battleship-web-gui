@@ -46,18 +46,22 @@
 </head>
 <script>
   document.addEventListener('DOMContentLoaded', event => {
-    document.querySelector('#settings').addEventListener('submit', joinToGame);
-    document.querySelector('#next-turn').addEventListener('click', updateGameState);
+    document.querySelector('#settings').addEventListener('submit', handleJoinToGameEvent);
     document.addEventListener('keydown', handleKeyboardEvent);
   });
 
-  function joinToGame(event) {
+  function handleJoinToGameEvent(event) {
     event.preventDefault();
     postToServer('/snake', 'joinGame', initGame);
+    updateGameStateContinously();
+
+    function updateGameStateContinously() {
+      updateGameState();
+      setTimeout(updateGameStateContinously, 100);
+    }
   }
 
-  function updateGameState(event) {
-    event.preventDefault();
+  function updateGameState() {
     getFromServer('/snake', initGame);
   }
 
@@ -141,7 +145,6 @@
         <label>Player name<br/><input type="text" id="player-name-input"></label>
         <label>Server address<br/><input type="text" id="server-address-input"></label>
         <button type="submit">Connect</button>
-        <button id="next-turn">Next turn</button>
     </form>
     <div class="row">
         <div class="column">

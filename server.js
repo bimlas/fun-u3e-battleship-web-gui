@@ -3,6 +3,11 @@ const url = require('url');
 const game = require('./games/snake');
 
 game.initGame();
+updateGameStateContinously();
+function updateGameStateContinously() {
+  game.nextTick();
+  setTimeout(updateGameStateContinously, 300);
+}
 
 const httpServer = http.createServer(function (req, resp) {
   const
@@ -13,7 +18,6 @@ const httpServer = http.createServer(function (req, resp) {
 
   respond('/snake',
     () => {
-      game.nextTick();
       return JSON.stringify(game.getBoard());
     },
     (postDataObject) => {
