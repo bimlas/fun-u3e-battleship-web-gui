@@ -10,6 +10,12 @@ module.exports.initGame = initGame;
 function initGame() {
   createEmptyBoard(boardWidth, boardHeight);
   placeFoodRandomly();
+  updateGameStateContinuously();
+
+  function updateGameStateContinuously() {
+    nextTick();
+    setTimeout(updateGameStateContinuously, 300);
+  }
 }
 
 module.exports.addPlayer = addPlayer;
