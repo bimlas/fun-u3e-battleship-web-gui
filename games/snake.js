@@ -68,33 +68,12 @@ function playerAction(playerName, actionName) {
 
 module.exports.nextTick = nextTick;
 function nextTick() {
-  if (Object.keys(players).length === 0) {
-    return;
-  }
+  if (!hasPlayers()) return;
 
-  forEachBoardCell((x, y, cellValue) => {
-    if(cellValue > 0) {
-      board[y][x] -= 1;
-    }
-  });
+  updateSnakeCells();
 
-  Object.keys(players).forEach(playerName => {
-    const player = players[playerName];
-
-    player.head.x += player.movement.x;
-    player.head.y += player.movement.y;
-
-    if(board[player.head.y][player.head.x] < 0) {
-      console.log('Megeszlek, had novekedjek!');
-      player.snakeLength += 1;
-      placeFoodRandomly();
-    }
-
-    if(board[player.head.y][player.head.x] > 0) {
-      console.log('Tekereg a kigyo, a farkaba harap...');
-      player.movement.x = player.movement.y = 0;
-    }
-    board[player.head.y][player.head.x] = player.snakeLength;
+  forEachPlayers(player => {
+    movePlayerHead(player);
   });
 }
 
@@ -118,10 +97,52 @@ function placeFoodRandomly() {
   board[y][x] = -1;
 }
 
-function forEachBoardCell(callback) {
+function movePlayerHead(player) {
+  player.head.x += player.movement.x;
+  player.head.y += player.movement.y;
+
+  if(isCellOfFood(player.head.x, player.head.y)) {
+    player.snakeLength += 1;
+    placeFoodRandomly();
+  }
+
+  if(isCellOfSnake(player.head.x, player.head.y)) {
+    player.movement.x = player.movement.y = 0;
+  }
+
+  board[player.head.y][player.head.x] = player.snakeLength;
+}
+
+function updateSnakeCells() {
+  forEachBoardCells((x, y, cellValue) => {
+    if(cellValue > 0) {
+      board[y][x] -= 1;
+    }
+  });
+}
+
+function hasPlayers() {
+  return Object.keys(players).length !== 0;
+}
+
+function isCellOfSnake(x, y) {
+  return board[y][x] > 0;
+}
+
+function isCellOfFood(x, y) {
+  return board[y][x] < 0;
+}
+
+function forEachBoardCells(callback) {
   for (let y = 0; y < boardHeight; y++) {
     for (let x = 0; x < boardWidth; x++) {
       callback(x, y, board[y][x]);
     }
   }
+}
+
+function forEachPlayers(callback) {
+  Object.keys(players).forEach(playerName => {
+    callback(players[playerName]);
+  });
 }
