@@ -8,7 +8,7 @@ let
 
 module.exports.initGame = initGame;
 function initGame() {
-  createEmptyBoard(boardWidth, boardHeight);
+  createEmptyBoard();
   placeFoodRandomly();
   updateGameStateContinuously();
 
@@ -82,10 +82,10 @@ function getBoard() {
   return board.map(rows => rows.map(cell => cell ? 1 : 0));
 }
 
-function createEmptyBoard(width, height) {
+function createEmptyBoard() {
   board = [];
-  for (let rowIndex = 0; rowIndex < height; rowIndex++) {
-    board.push(new Array(width));
+  for (let rowIndex = 0; rowIndex < boardHeight; rowIndex++) {
+    board.push(new Array(boardWidth));
   }
 }
 
