@@ -48,18 +48,26 @@
   document.addEventListener('DOMContentLoaded', event => {
     document.querySelector('#settings').addEventListener('submit', joinToGame);
     document.querySelector('#next-turn').addEventListener('click', updateGameState);
+    document.addEventListener('keydown', handleKeyboardEvent);
   });
 
   function joinToGame(event) {
     event.preventDefault();
-
-    const playerName = document.querySelector('#player-name-input').value;
-    postToServer('/snake', {playerName: playerName, action: 'joinGame'}, initGame);
+    postToServer('/snake', 'joinGame', initGame);
   }
 
   function updateGameState(event) {
     event.preventDefault();
     getFromServer('/snake', initGame);
+  }
+
+  function handleKeyboardEvent(event) {
+    switch (event.key) {
+      case 'ArrowUp': event.preventDefault(); postToServer('/snake', 'moveNorth'); break;
+      case 'ArrowDown': event.preventDefault(); postToServer('/snake', 'moveSouth'); break;
+      case 'ArrowRight': event.preventDefault(); postToServer('/snake', 'moveEast'); break;
+      case 'ArrowLeft': event.preventDefault(); postToServer('/snake', 'moveWest'); break;
+    }
   }
 
   function getFromServer(path, callback) {
@@ -77,10 +85,15 @@
     }
   }
 
-  function postToServer(path, data, callback) {
+  function postToServer(path, action, callback) {
     const
       Http = new XMLHttpRequest(),
-      url = document.querySelector('#server-address-input').value;
+      url = document.querySelector('#server-address-input').value,
+      playerName = document.querySelector('#player-name-input').value,
+      data = {
+        playerName: playerName,
+        action: action,
+      };
 
     Http.open("POST", `${url}${path}`);
     Http.send(JSON.stringify(data));
