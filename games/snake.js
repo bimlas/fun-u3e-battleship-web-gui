@@ -9,6 +9,7 @@ let
 module.exports.initGame = initGame;
 function initGame() {
   createEmptyBoard(boardWidth, boardHeight);
+  placeFoodRandomly();
 }
 
 module.exports.addPlayer = addPlayer;
@@ -80,6 +81,7 @@ function nextTick() {
     if(board[player.head.y][player.head.x] < 0) {
       console.log('Megeszlek, had novekedjek!');
       player.snakeLength += 1;
+      placeFoodRandomly();
     }
 
     if(board[player.head.y][player.head.x] > 0) {
@@ -100,6 +102,14 @@ function createEmptyBoard(width, height) {
   for (let rowIndex = 0; rowIndex < height; rowIndex++) {
     board.push(new Array(width));
   }
+}
+
+function placeFoodRandomly() {
+  const
+    y = Math.floor(Math.random() * boardHeight),
+    x = Math.floor(Math.random() * boardWidth);
+
+  board[y][x] = -1;
 }
 
 function forEachBoardCell(callback) {
