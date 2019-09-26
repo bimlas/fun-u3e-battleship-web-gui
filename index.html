@@ -39,15 +39,40 @@
             border: 1px solid #a5a5ff;
             box-sizing: border-box;
         }
+        .active {
+            background-color: #ffff00;
+        }
     </style>
 </head>
 <script>
   document.addEventListener('DOMContentLoaded', event => {
-    document.querySelector('#settings').addEventListener('submit', (event) => {
-      event.preventDefault();
-      getFromServer('/boards', initGame);
-    })
+    document.querySelector('#settings').addEventListener('submit', handleJoinToGameEvent);
+    document.addEventListener('keydown', handleKeyboardEvent);
   });
+
+  function handleJoinToGameEvent(event) {
+    event.preventDefault();
+    postToServer('/snake', 'joinGame', initGame);
+    updateGameStateContinously();
+
+    function updateGameStateContinously() {
+      updateGameState();
+      setTimeout(updateGameStateContinously, 100);
+    }
+  }
+
+  function updateGameState() {
+    getFromServer('/snake', initGame);
+  }
+
+  function handleKeyboardEvent(event) {
+    switch (event.key) {
+      case 'ArrowUp': event.preventDefault(); postToServer('/snake', 'moveNorth'); break;
+      case 'ArrowDown': event.preventDefault(); postToServer('/snake', 'moveSouth'); break;
+      case 'ArrowRight': event.preventDefault(); postToServer('/snake', 'moveEast'); break;
+      case 'ArrowLeft': event.preventDefault(); postToServer('/snake', 'moveWest'); break;
+    }
+  }
 
   function getFromServer(path, callback) {
     const
@@ -64,12 +89,17 @@
     }
   }
 
-  function postToServer(data, callback) {
+  function postToServer(path, action, callback) {
     const
       Http = new XMLHttpRequest(),
-      url = document.querySelector('#server-address-input').value;
+      url = document.querySelector('#server-address-input').value,
+      playerName = document.querySelector('#player-name-input').value,
+      data = {
+        playerName: playerName,
+        action: action,
+      };
 
-    Http.open("POST", url);
+    Http.open("POST", `${url}${path}`);
     Http.send(JSON.stringify(data));
 
     Http.onreadystatechange = (e) => {
@@ -79,10 +109,10 @@
     }
   }
 
-  function initGame(gameProperties) {
+  function initGame(board) {
     const
-      numberOfColumns = gameProperties.width,
-      numberOfRows = gameProperties.height;
+      numberOfColumns = board[0].length,
+      numberOfRows = board.length;
 
     document.querySelectorAll('.cell').forEach(cell => cell.remove());
 
@@ -92,16 +122,13 @@
           const cell = createCell(numberOfColumns, numberOfRows);
           cell.classList.add(`x${x}`);
           cell.classList.add(`y${y}`);
+          if(board[y][x] === 1) {
+            cell.classList.add('active');
+          }
           battlefield.appendChild(cell);
         }
       }
     });
-
-    /*
-     PELDA AZ API HASZNALATARA:
-     Az {x=2, y=3} koordinatan (0-tol indulo indexek) egy hajo van
-     */
-    document.querySelector('#enemy .x2.y3').style.backgroundColor = '#ffff00';
   }
 
   function createCell(numberOfColumns, numberOfRows) {
