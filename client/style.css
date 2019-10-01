@@ -1,0 +1,44 @@
+body {
+    background-color: #a5a5ff;
+    font-family: monospace;
+    color: #ffff00;
+    font-weight: bold;
+}
+
+.row, .column {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.hud {
+    background-color: #aaffee;
+    color: #000000;
+    width: 75%;
+    min-height: 100px;
+    border: 8px solid #a1683c;
+    padding: 8px;
+}
+
+.battlefield {
+    background-color: #4242e7;
+    border: 8px solid #ffff00;
+    width: 500px;
+    height: 500px;
+    line-height: 0;
+}
+
+.cell {
+    display: inline-block;
+    background-color: #4242e7;
+    border: 1px solid #a5a5ff;
+    box-sizing: border-box;
+}
+
+.active {
+    background-color: #ffff00;
+}

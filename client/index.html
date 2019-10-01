@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>u3e Battleship web GUI</title>
+    <link href="style.css" rel="stylesheet"/>
+    <script src="client.js"></script>
+</head>
+<body>
+    <form id="settings" class="column">
+        <h1>u3e Battleship</h1>
+        <label>Player name<br/><input type="text" id="player-name-input"></label>
+        <label>Server address<br/><input type="text" id="server-address-input"></label>
+        <button type="submit">Connect</button>
+    </form>
+    <div class="row">
+        <div class="column">
+            <div class="battlefield" id="player"></div>
+            <h2 id="player-name">Player</h2>
+            <div class="hud">Remaining player ships...</div>
+        </div>
+        <div class="column">
+            <div class="battlefield" id="enemy"></div>
+            <h2 id="enemy-name">Enemy</h2>
+            <div class="hud">Remaining enemy ships...</div>
+        </div>
+    </div>
+</body>
+</html>
