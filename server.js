@@ -13,30 +13,37 @@ const httpServer = http.createServer(function (req, resp) {
 
   respond('/snake',
     () => {
-      return JSON.stringify(game.getBoard());
+      answerWithJSON(game.getBoard());
     },
     (postDataObject) => {
       game.playerAction(postDataObject.playerName, postDataObject.action);
-      return JSON.stringify(game.getBoard());
+      answerWithJSON(game.getBoard());
     }
   );
 
+  function answerWithJSON(answer) {
+    resp.end(JSON.stringify(answer));
+  }
+
   function respond(path, getHandler, postHandler) {
+    if (requestedPath !== path) return;
+
     /*
     Set Access-Control-Allow-Origin http header will fix
     "No 'Access-Control-Allow-Origin' header is present on the requested resource"
     error (CORS policy) when use XMLHttpRequest object to get this server
     page via ajax method.
     */
-    resp.writeHead(200, {'Access-Control-Allow-Origin': '*'});
-
-    if (requestedPath !== path) return;
+    resp.writeHead(200, {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+    });
 
     if ((req.method === 'GET') && getHandler) {
-      resp.end(getHandler());
+      getHandler();
     }
     if ((req.method === 'POST') && postHandler) {
-      resp.end(passPostData(postHandler));
+      passPostData(postHandler);
     }
   }
 
