@@ -98,16 +98,22 @@ function placeFoodRandomly() {
 }
 
 function movePlayerHead(player) {
-  player.head.x += player.movement.x;
-  player.head.y += player.movement.y;
+  const nextPosition = {
+    x: player.head.x + player.movement.x,
+    y: player.head.y + player.movement.y,
+  };
+
+  if(isOutOfBoard(nextPosition.x, nextPosition.y) || isCellOfSnake(nextPosition.x, nextPosition.y)) {
+    player.movement.x = player.movement.y = 0;
+    return;
+  }
+
+  player.head.x = nextPosition.x;
+  player.head.y = nextPosition.y;
 
   if(isCellOfFood(player.head.x, player.head.y)) {
     player.snakeLength += 1;
     placeFoodRandomly();
-  }
-
-  if(isCellOfSnake(player.head.x, player.head.y)) {
-    player.movement.x = player.movement.y = 0;
   }
 
   board[player.head.y][player.head.x] = player.snakeLength;
@@ -123,6 +129,10 @@ function updateSnakeCells() {
 
 function hasPlayers() {
   return Object.keys(players).length !== 0;
+}
+
+function isOutOfBoard(x, y) {
+  return (x < 0 || x >= boardWidth) || (y < 0 || y >= boardHeight);
 }
 
 function isCellOfSnake(x, y) {
