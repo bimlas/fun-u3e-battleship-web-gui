@@ -1,0 +1,11 @@
+{
+  "name": "pixel-war",
+  "version": "0.1.0",
+  "description": "Retro style gaming framework, just for fun and practicing",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "bimlas",
+  "license": "MIT"
+}
