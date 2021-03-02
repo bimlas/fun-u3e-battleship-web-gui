@@ -1,4 +1,5 @@
 const http = require('http');
+const ws = require('ws');
 const url = require('url');
 const game = require('./games/snake');
 
@@ -11,7 +12,7 @@ const httpServer = http.createServer(function (req, resp) {
 
   console.log(`${(new Date()).toISOString()} ${req.method} "${requestedPath}"`);
 
-  respond('/snake',
+  respond('/',
     () => {
       answerWithJSON(game.getBoard());
     },
@@ -60,6 +61,18 @@ const httpServer = http.createServer(function (req, resp) {
       return callback(postDataObject);
     })
   }
+});
+
+const wsServer = new ws.Server({
+  server: httpServer
+});
+
+wsServer.on('connection', function (connection) {
+  connection.send('Welcome!');
+
+  connection.on('message', function (message) {
+    console.log(`${(new Date()).toISOString()} WEBSOCKET ${message}`);
+  });
 });
 
 httpServer.listen(8888);
